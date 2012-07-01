@@ -36,7 +36,3 @@ main = do
 	(opts, toRead, msgs) <- parseArgs
 	notifyErrors msgs
 	runReaderT (copyFilesToLibrary toRead) (Config.default_config {Config.library = library opts})
-  {-
-	 -tags <- mapM (\s -> tagOf s >>= title ) toRead
-	 -forM_ tags putStrLn
-   -}
