@@ -1,0 +1,11 @@
+MusicSorter="/home/aaron/Projects/MusicSorter/" filter="*.cabal" {
+ muso.cabal
+ src="src" filter="*.hs" {
+	music_sorter.hs
+ }
+ Pkg="src/MuSo" filter="*.hs" {
+	PathFormat.hs
+  CopyFiles.hs
+	Config.hs
+ }
+}

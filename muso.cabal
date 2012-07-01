@@ -1,0 +1,29 @@
+name: MuSo
+version: 0.0.0
+cabal-version: -any
+build-type: Simple
+license: AllRightsReserved
+license-file: ""
+copyright:
+maintainer: Aaron Karper
+				containers -any
+stability: None whatsoever
+homepage:
+package-url:
+bug-reports:
+synopsis: Music Sorter
+description: Copies music files depending on 
+							the tags they possess
+build-depends:
+    base,
+    containers,
+    parsec,
+    mtl,
+		taglib,
+		filepath,
+		directory
+
+executable: music-sorter
+main-is: music_sorter.hs
+buildable: True
+hs-source-dirs: src,src/MuSo
