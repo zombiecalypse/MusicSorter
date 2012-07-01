@@ -1,5 +1,8 @@
 bin/
 dist/
+cabal-dev
 *.o
 *.hi
 *.lksh*
+*.chi
+*.chs.h
