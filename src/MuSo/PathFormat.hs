@@ -8,18 +8,18 @@ import Text.Printf (printf)
 
 import MuSo.Config
 
-tagOf :: String -> MaybeT IO Tag
+tagOf :: String -> MaybeT (ReaderT Config IO) Tag
 tagOf s = do
-	tagfile <- MaybeT $ open s
-	MaybeT $ tag tagfile
+	tagfile <- MaybeT $ lift $ open s
+	MaybeT $ lift $ tag tagfile
 
-pathOf :: FilePath -> ReaderT Config (MaybeT IO) FilePath
+pathOf :: FilePath -> MaybeT (ReaderT Config IO) FilePath
 pathOf s = do
 	let extension = takeExtension s
 	format <- asks pathFormat
-	tag <- lift $ tagOf s
+	tag <- tagOf s
 	let specFormat =  lift $ mapM (translateDirective tag) format
-	inlib <- lift $ (liftM concat) specFormat
+	inlib <- lift $ liftM concat specFormat
 	lib <- asks library
 	let libsplit = splitDirectories lib
 	return $ normalise $ lib </> (inlib ++ extension)

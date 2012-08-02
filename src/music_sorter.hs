@@ -36,4 +36,4 @@ notifyErrors msgs = do
 main = do
 	(opts, toRead, msgs) <- parseArgs
 	notifyErrors msgs
-	runMaybeT $ runReaderT (copyFilesToLibrary toRead) (Config.default_config {Config.library = library opts})
+	runReaderT (copyFilesToLibrary toRead) (Config.default_config {Config.library = library opts})

@@ -9,23 +9,35 @@ import Control.Monad.Maybe
 discover :: FilePath -> IO [FilePath]
 discover f = do
 	file <- doesFileExist f
+	dir  <- doesDirectoryExist  f
 	if file 
 		then return [f]
-		else do
+		else if dir 
+			then do
 						contents <- getDirectoryContents f
 						walked <- mapM discover $ map (f </>) $ filter (not . flip elem [".",".."]) contents
 						return $ concat walked
+			else do
+					putStrLn $ "No such file..." ++ f 
+					return []
 		
-copyFilesToLibrary :: [FilePath] -> ReaderT Config (MaybeT IO) ()
+copyFilesToLibrary :: [FilePath] -> ReaderT Config IO ()
 copyFilesToLibrary l = do
-	read <- lift $ lift $ mapM discover l
+	read <- lift $ mapM discover l
 	forM_ (concat read) copyFileToLibrary
 
 mkdir_p = createDirectoryIfMissing True 
 
+copyFileToLibrary :: FilePath -> ReaderT Config IO ()
 copyFileToLibrary s = do
-			path <- pathOf s
-			lift $ lift $ putStrLn $ s ++ " >>>> " ++ path
-			let dirname = takeDirectory path
-			lift $ lift $ mkdir_p dirname
-			lift $ lift $ copyFile s path
+			path <- runMaybeT $ pathOf s
+			case path of 
+					Nothing -> putNoSuchFile
+					Just a -> copyExistingFile a 
+			where
+				putNoSuchFile = lift $ putStrLn $ s++ " has no valid tag!"
+				copyExistingFile path = do
+							lift $ putStrLn $ s ++ " >>>> " ++ path
+							let dirname = takeDirectory path
+							lift $ mkdir_p dirname
+							lift $ copyFile s path
