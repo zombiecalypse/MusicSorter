@@ -4,6 +4,7 @@ import System.Console.GetOpt
 import Control.Monad 
 import Control.Monad.Error
 import Control.Monad.Reader
+import Control.Monad.Maybe
 import Data.Maybe (fromJust)
 
 import MuSo.PathFormat
@@ -35,4 +36,4 @@ notifyErrors msgs = do
 main = do
 	(opts, toRead, msgs) <- parseArgs
 	notifyErrors msgs
-	runReaderT (copyFilesToLibrary toRead) (Config.default_config {Config.library = library opts})
+	runMaybeT $ runReaderT (copyFilesToLibrary toRead) (Config.default_config {Config.library = library opts})

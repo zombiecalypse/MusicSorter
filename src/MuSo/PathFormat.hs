@@ -1,5 +1,6 @@
 module MuSo.PathFormat (pathOf) where
 import Control.Monad.Reader
+import Control.Monad.Maybe
 import Data.Maybe
 import Sound.TagLib
 import System.FilePath
@@ -7,18 +8,17 @@ import Text.Printf (printf)
 
 import MuSo.Config
 
-tagOf :: String -> IO Tag
+tagOf :: String -> MaybeT IO Tag
 tagOf s = do
-	tagfile <- open s
-	tag_ <- tag (fromJust tagfile)
-	return $ fromJust tag_
+	tagfile <- MaybeT $ open s
+	MaybeT $ tag tagfile
 
-pathOf :: FilePath -> ReaderT Config IO FilePath
+pathOf :: FilePath -> ReaderT Config (MaybeT IO) FilePath
 pathOf s = do
 	let extension = takeExtension s
 	format <- asks pathFormat
 	tag <- lift $ tagOf s
-	let specFormat =  mapM (translateDirective tag) format
+	let specFormat =  lift $ mapM (translateDirective tag) format
 	inlib <- lift $ (liftM concat) specFormat
 	lib <- asks library
 	let libsplit = splitDirectories lib

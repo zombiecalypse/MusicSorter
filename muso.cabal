@@ -21,7 +21,8 @@ build-depends:
     mtl,
 		taglib,
 		filepath,
-		directory
+		directory,
+		MaybeT
 
 executable: music-sorter
 main-is: music_sorter.hs

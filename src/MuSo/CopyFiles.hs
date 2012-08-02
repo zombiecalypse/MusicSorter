@@ -4,6 +4,7 @@ import MuSo.Config
 import System.Directory
 import System.FilePath
 import Control.Monad.Reader
+import Control.Monad.Maybe
 
 discover :: FilePath -> IO [FilePath]
 discover f = do
@@ -15,16 +16,16 @@ discover f = do
 						walked <- mapM discover $ map (f </>) $ filter (not . flip elem [".",".."]) contents
 						return $ concat walked
 		
-copyFilesToLibrary :: [FilePath] -> ReaderT Config IO ()
+copyFilesToLibrary :: [FilePath] -> ReaderT Config (MaybeT IO) ()
 copyFilesToLibrary l = do
-	read <- lift $ mapM discover l
+	read <- lift $ lift $ mapM discover l
 	forM_ (concat read) copyFileToLibrary
 
 mkdir_p = createDirectoryIfMissing True 
 
 copyFileToLibrary s = do
 			path <- pathOf s
-			lift $ putStrLn $ s ++ " >>>> " ++ path
+			lift $ lift $ putStrLn $ s ++ " >>>> " ++ path
 			let dirname = takeDirectory path
-			lift $ mkdir_p dirname
-			lift $ copyFile s path
+			lift $ lift $ mkdir_p dirname
+			lift $ lift $ copyFile s path
